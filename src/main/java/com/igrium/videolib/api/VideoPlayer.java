@@ -24,4 +24,18 @@ public interface VideoPlayer extends AutoCloseable {
 
     public MediaInterface<?> getMediaInterface();
     public ControlsInterface getControlsInterface();
+
+    /**
+     * Generate a texture identifier from a video player identifier. This is just an
+     * internal utility function. It's not guarenteed that any given video player
+     * will use this scheme. Use {@link VideoPlayer#getTexture()} instead.
+     * 
+     * @param id Video player ID.
+     * @return Texture ID.
+     */
+    public static Identifier getTextureId(Identifier id) {
+        String namespace = id.getNamespace();
+        String path = "videoplayers/"+id.getPath();
+        return new Identifier(namespace, path);
+    }
 }

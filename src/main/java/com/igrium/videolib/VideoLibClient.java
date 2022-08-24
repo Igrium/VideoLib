@@ -1,7 +1,7 @@
 package com.igrium.videolib;
 
-import com.igrium.videolib.api.MediaManager;
 import com.igrium.videolib.api.VideoManager;
+import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.test.AddVideoPlayerCommand;
 import com.igrium.videolib.test.TestRenderDispatcher;
 import com.igrium.videolib.vlc.VLCVideoManager;
@@ -9,6 +9,7 @@ import com.igrium.videolib.vlc.VLCVideoManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.util.Identifier;
 
 public class VideoLibClient implements ClientModInitializer {
 
@@ -16,6 +17,7 @@ public class VideoLibClient implements ClientModInitializer {
 
     private TestRenderDispatcher testRenderDispatcher;
     private VideoManager videoManager;
+    private VideoPlayer mainPlayer;
 
     public static VideoLibClient getInstance() {
         return instance;
@@ -25,6 +27,9 @@ public class VideoLibClient implements ClientModInitializer {
         return videoManager;
     }
 
+    public VideoPlayer getMainPlayer() {
+        return mainPlayer;
+    }
 
     public TestRenderDispatcher getTestRenderDispatcher() {
         return testRenderDispatcher;
@@ -36,6 +41,7 @@ public class VideoLibClient implements ClientModInitializer {
         testRenderDispatcher = new TestRenderDispatcher();
 
         videoManager = new VLCVideoManager();
+        mainPlayer = videoManager.getOrCreate(new Identifier("videolib", "default"));
 
         WorldRenderEvents.AFTER_ENTITIES.register(testRenderDispatcher::render);
         AddVideoPlayerCommand.register(ClientCommandManager.DISPATCHER);

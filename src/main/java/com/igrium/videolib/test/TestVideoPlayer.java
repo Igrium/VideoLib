@@ -1,11 +1,10 @@
 package com.igrium.videolib.test;
 
-import com.igrium.videolib.api.MediaManager;
-
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
@@ -15,9 +14,9 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vector4f;
 
 public class TestVideoPlayer {
-    public static final Identifier TEXTURE = MediaManager.TEXTURE_ID;
 
     private Vec3d pos = new Vec3d(0, 0, 0);
+    private Identifier texture = TextureManager.MISSING_IDENTIFIER;
 
     public void setPos(Vec3d pos) {
         this.pos = pos;
@@ -27,11 +26,19 @@ public class TestVideoPlayer {
         return pos;
     }
 
+    public void setTexture(Identifier texture) {
+        this.texture = texture;
+    }
+
+    public Identifier getTexture() {
+        return texture;
+    }
+
     public void render(float tickDelta, MatrixStack matrices, int light, VertexConsumerProvider vertexConsumers) {
         matrices.push();
         matrices.translate(pos.x, pos.y, pos.z);
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(getTexture()));
         renderQuad(-1, 0, 1, 1, matrices.peek(), light, buffer);
 
         matrices.pop();

@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.api.playback.ControlsInterface;
 import com.igrium.videolib.api.playback.MediaInterface;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -24,6 +25,8 @@ public class VLCVideoPlayer implements VideoPlayer {
     protected VLCMediaInterface mediaInterface = new VLCMediaInterface();
     protected VLCControlsInterface controlsInterface = new VLCControlsInterface();
 
+    private boolean textureRegistered = false;
+
     @Nullable
     private VLCVideoHandle currentMedia;
     
@@ -34,38 +37,39 @@ public class VLCVideoPlayer implements VideoPlayer {
     }
 
     protected void init() {
-        if (mediaPlayer != null) {
-            throw new IllegalStateException("Media player has already been initialized.");
-        }
+        if (mediaPlayer != null) return;
 
         mediaPlayer = manager.getFactory().mediaPlayers().newEmbeddedMediaPlayer();
         surface = new OpenGLVideoSurface();
         mediaPlayer.videoSurface().set(surface);
-
-        MinecraftClient.getInstance().getTextureManager().registerTexture(getTexture(), surface.getTexture());
     }
 
     public final Identifier getId() {
         return id;
     }
-
+    
     public Identifier getTexture() {
-        return getTextureId(getId());
+        Identifier texId = VideoPlayer.getTextureId(getId());
+        if (!textureRegistered) registerTexture(texId);
+        return texId;
     }
 
-    /**
-     * Generate a texture identifier from a video player identifier.
-     * @param id Video player ID.
-     * @return Texture ID.
-     */
-    public static Identifier getTextureId(Identifier id) {
-        String namespace = id.getNamespace();
-        String path = "videoplayers/"+id;
-        return new Identifier(namespace, path);
+    // We can't do this in constructor because the texture manager isn't created yet.
+    protected void registerTexture(Identifier texId) {
+        if (textureRegistered) return;
+        if (!RenderSystem.isOnRenderThread()) {
+            RenderSystem.recordRenderCall(() -> registerTexture(texId));
+            return;
+        }
+
+        MinecraftClient.getInstance().getTextureManager().registerTexture(texId, surface.getTexture());
+        textureRegistered = true;
     }
+
 
     @Override
     public void close() {
+        getControlsInterface().stop();
         surface.texture.close();        
     }
 
@@ -83,13 +87,14 @@ public class VLCVideoPlayer implements VideoPlayer {
 
         @Override
         public boolean load(VLCVideoHandle handle) {
+            currentMedia = handle;
             return mediaPlayer.media().prepare(handle.getMrl());
         }
 
         @Override
         public boolean play(VLCVideoHandle handle) {
             currentMedia = handle;
-            return false;
+            return mediaPlayer.media().play(handle.getMrl());
         }
 
         @Override
