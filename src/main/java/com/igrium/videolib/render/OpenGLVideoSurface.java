@@ -2,8 +2,11 @@ package com.igrium.videolib.render;
 
 import java.nio.ByteBuffer;
 
+import org.lwjgl.opengl.GL12;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.MinecraftClient;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CallbackVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurface;
@@ -21,10 +24,11 @@ public class OpenGLVideoSurface extends VideoSurface {
     
     private final GlBufferFormatCallback bufferFormatCallback = new GlBufferFormatCallback();
     private final GlBufferRenderCallback bufferRenderCallback = new GlBufferRenderCallback();
+    MinecraftClient client = MinecraftClient.getInstance();
 
     protected final CallbackVideoSurface baseVideoSurface;
     
-    protected final VideoTexture texture = new VideoTexture();
+    protected final BufferBackedTexture texture = new BufferBackedTexture();
 
     public OpenGLVideoSurface(VideoSurfaceAdapter videoSurfaceAdapter) {
         super(videoSurfaceAdapter);
@@ -48,7 +52,7 @@ public class OpenGLVideoSurface extends VideoSurface {
      * Get the texture this surface uses.
      * @return MC Texture
      */
-    public VideoTexture getTexture() {
+    public BufferBackedTexture getTexture() {
         return texture;
     }
     
@@ -66,7 +70,7 @@ public class OpenGLVideoSurface extends VideoSurface {
 
         @Override
         public void allocatedBuffers(ByteBuffer[] buffers) {
-            texture.allocate(sourceWidth, sourceHeight);
+            texture.setBuffer(buffers[0], sourceWidth, sourceHeight, GL12.GL_BGRA);
         }
     }
 
@@ -74,7 +78,7 @@ public class OpenGLVideoSurface extends VideoSurface {
 
         @Override
         public void display(MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {
-            texture.getBuffer().put(nativeBuffers[0]);
+            if (client.isPaused()) return;
             RenderSystem.recordRenderCall(texture::upload);
         }
         

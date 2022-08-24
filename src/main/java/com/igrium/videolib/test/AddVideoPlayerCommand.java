@@ -31,5 +31,16 @@ public final class AddVideoPlayerCommand {
             return 1;
         }).build();
         dispatcher.getRoot().addChild(spawnVideoPlayer);
+
+        LiteralCommandNode<FabricClientCommandSource> updateVideoPlayer = literal("updateVideoPlayer").executes(context -> {
+            MediaManager mediaManager = VideoLibClient.getInstance().getMediaManager();
+            mediaManager.getMediaPlayer().media()
+                    .play("file:///F:/Documents/Programming/tests/vlcj_test/app/src/main/resources/creeper.mp4");
+            
+            context.getSource().sendFeedback(new LiteralText("Updated video."));
+            return 1;
+        }).build();
+        dispatcher.getRoot().addChild(updateVideoPlayer);
     }
+    
 }
