@@ -7,20 +7,30 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.system.MemoryUtil;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.texture.AbstractTexture;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.resource.ResourceManager;
 
 /**
  * A texture that is backed by a video source.
  */
 public class VideoTexture extends AbstractTexture {
+    // private Format format = new Format();
 
     private ByteBuffer buffer;
+    private long pointer;
+
+    private NativeImage image;
 
     private int width;
     private int height;
+
+    private boolean isPrepared = false;
 
     public VideoTexture(int width, int height) {
         allocate(width, height);
@@ -58,8 +68,13 @@ public class VideoTexture extends AbstractTexture {
      */
     public synchronized void upload() {
         RenderSystem.assertOnRenderThread();
+        if (!isPrepared) {
+            TextureUtil.prepareImage(getGlId(), width, height);
+            isPrepared = true;
+        }
+
         this.bindTexture();
-        GL11.glDrawPixels(width, height, GL12.GL_BGR, GL11.GL_BYTE, buffer);
+        GlStateManager._texSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, width, height, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, pointer);
     }
 
     /**
@@ -79,7 +94,10 @@ public class VideoTexture extends AbstractTexture {
         this.width = width;
         this.height = height;
 
-        buffer = MemoryUtil.memAlloc(width * height * 3);
+        buffer = MemoryUtil.memAlloc(width * height * 4);
+        pointer = MemoryUtil.memAddress(buffer);
+
+        isPrepared = false;
     }
 
     @Override
@@ -90,4 +108,4 @@ public class VideoTexture extends AbstractTexture {
         super.close();
     }
     
-}
+}   

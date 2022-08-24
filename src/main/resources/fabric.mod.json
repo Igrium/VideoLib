@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "videolib",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "VideoLib",
+  "description": "A library enabling video playback in Minecraft",
   "authors": [
-    "Me!"
+    "Igrium"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "http://igrium.com/",
+    "sources": ""
   },
 
   "license": "CC0-1.0",

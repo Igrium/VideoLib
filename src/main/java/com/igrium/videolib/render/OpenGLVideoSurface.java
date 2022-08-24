@@ -75,7 +75,7 @@ public class OpenGLVideoSurface extends VideoSurface {
         @Override
         public void display(MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {
             texture.getBuffer().put(nativeBuffers[0]);
-            RenderSystem.recordRenderCall(() -> texture.upload());
+            RenderSystem.recordRenderCall(texture::upload);
         }
         
     }
