@@ -28,6 +28,15 @@ public class BufferBackedTexture extends AbstractTexture {
     private int format;
     Profiler profiler = MinecraftClient.getInstance().getProfiler();
 
+    /**
+     * Allocate a buffer and create a buffer-backed texture that will free the
+     * buffer when it's closed.
+     * 
+     * @param width  Width of the image.
+     * @param height Height of the image.
+     * @param format OpenGL format of the pixel data.
+     * @return The texture.
+     */
     public static BufferBackedTexture create(int width, int height, int format) {
         ByteBuffer buffer = MemoryUtil.memAlloc(width * height * 4);
         BufferBackedTexture tex = new BufferBackedTexture(buffer, width, height, format) {
@@ -41,17 +50,27 @@ public class BufferBackedTexture extends AbstractTexture {
         return tex;
     }
 
+    /**
+     * Create a buffer backed texture
+     * @param buffer Buffer to use. MAY NOT BE A HEAP BUFFER
+     * @param width Width of the image.
+     * @param height Height of the image.
+     * @param format OpenGL format of the pixel data.
+     */
     public BufferBackedTexture(ByteBuffer buffer, int width, int height, int format) {
         setBuffer(buffer, width, height, format);
     }
 
+    /**
+     * Create an instance without a backing buffer. Most methods will not work until
+     * a buffer is set.
+     */
     public BufferBackedTexture() {
         setBuffer(null, 0, 0, GL12.GL_BGRA);
     }
 
     /**
-     * Get the buffer that this texture uses. Uses should be in a synchronised block
-     * with this object in case another method tries to call allocate.
+     * Get the buffer that this texture uses.
      * 
      * @return The buffer.
      */
@@ -59,6 +78,13 @@ public class BufferBackedTexture extends AbstractTexture {
         return buffer;
     }
     
+    /**
+     * Set the buffer that this texture uses.
+     * @param buffer Buffer to use. MAY NOT BE A HEAP BUFFER
+     * @param width Width of the image.
+     * @param height Height of the image.
+     * @param format OpenGL format of the pixel data.
+     */
     public synchronized void setBuffer(ByteBuffer buffer, int width, int height, int format) {
         this.buffer = buffer;
         this.width = width;
@@ -67,14 +93,26 @@ public class BufferBackedTexture extends AbstractTexture {
         isPrepared = false;
     }
 
+    /**
+     * Get the width of the image.
+     * @return Texture width.
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Get the height of the image.
+     * @return Texture height.
+     */
     public int getHeight() {
         return height;
     }
-
+    
+    /**
+     * Get the pixel format of the image.
+     * @return OpenGL pixel format.
+     */
     public int getFormat() {
         return format;
     }

@@ -2,6 +2,7 @@ package com.igrium.videolib.test;
 
 import com.igrium.videolib.VideoLibClient;
 import com.igrium.videolib.api.MediaManager;
+import com.igrium.videolib.api.VideoManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
@@ -15,11 +16,12 @@ public final class AddVideoPlayerCommand {
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         
         LiteralCommandNode<FabricClientCommandSource> spawnVideoPlayer = literal("spawnVideoPlayer").executes(context -> {
-            MediaManager mediaManager = VideoLibClient.getInstance().getMediaManager();
+            VideoManager videoManager = VideoLibClient.getInstance().getVideoManager();
 
             TestVideoPlayer videoPlayer = new TestVideoPlayer();
             videoPlayer.setPos(context.getSource().getPosition());
 
+            
             mediaManager.setup();
             mediaManager.getMediaPlayer().media()
                     .play("file:///F:/Documents/Programming/tests/vlcj_test/app/src/main/resources/crash_test.mp4");

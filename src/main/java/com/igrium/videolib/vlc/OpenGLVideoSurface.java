@@ -1,9 +1,10 @@
-package com.igrium.videolib.render;
+package com.igrium.videolib.vlc;
 
 import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL12;
 
+import com.igrium.videolib.render.BufferBackedTexture;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +19,7 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.callback.RenderCallback;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32BufferFormat;
 
 /**
- * A video surface that draws to an OpenGL texture
+ * A VLCJ video surface that draws to an OpenGL texture
  */
 public class OpenGLVideoSurface extends VideoSurface {
     

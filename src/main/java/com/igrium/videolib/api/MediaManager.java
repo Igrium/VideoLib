@@ -1,6 +1,6 @@
 package com.igrium.videolib.api;
 
-import com.igrium.videolib.render.OpenGLVideoSurface;
+import com.igrium.videolib.vlc.OpenGLVideoSurface;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.AbstractTexture;
@@ -14,7 +14,6 @@ public class MediaManager {
     private MediaPlayerFactory factory;
     private EmbeddedMediaPlayer mediaPlayer;
     private OpenGLVideoSurface surface;
-
     private boolean isSetup = false;
 
     public MediaManager() {
