@@ -2,6 +2,8 @@ package com.igrium.videolib.api;
 
 import java.util.Collection;
 
+import com.igrium.videolib.util.MissingNativesException;
+
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.util.Identifier;
 
@@ -9,6 +11,16 @@ import net.minecraft.util.Identifier;
  * Responsible for loading and preparing video players.
  */
 public interface VideoManager extends AutoCloseable {
+
+    public static interface VideoManagerFactory {
+
+        /**
+         * Create a video manager.
+         * @return The newly-created video manager.
+         * @throws MissingNativesException If the native dependencies cannot be loaded.
+         */
+        public VideoManager create() throws MissingNativesException;
+    }
 
     /**
      * Was this video manager able to properly load it's native dependencies?

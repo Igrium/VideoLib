@@ -21,6 +21,7 @@
     "main": [
     ],
     "client": [
+      "com.igrium.videolib.VideoLib",
       "com.igrium.videolib.VideoLibClient"
     ]
   },

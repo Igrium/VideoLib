@@ -69,11 +69,9 @@ public final class VLCUtils {
     public static class VLCFileHandle implements VLCVideoHandle {
 
         private final File file;
-        private final URI url;
 
         public VLCFileHandle(File file) {
             this.file = file;
-            this.url = file.toURI();
         }
 
         @Override

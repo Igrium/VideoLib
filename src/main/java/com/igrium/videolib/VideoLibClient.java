@@ -4,6 +4,7 @@ import com.igrium.videolib.api.VideoManager;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.test.AddVideoPlayerCommand;
 import com.igrium.videolib.test.TestRenderDispatcher;
+import com.igrium.videolib.util.AfterInitCallback;
 import com.igrium.videolib.vlc.VLCVideoManager;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -25,13 +26,13 @@ public class VideoLibClient implements ClientModInitializer {
         return instance;
     }
 
-    public VideoManager getVideoManager() {
-        return videoManager;
-    }
+    // public VideoManager getVideoManager() {
+    //     return videoManager;
+    // }
 
-    public VideoPlayer getMainPlayer() {
-        return mainPlayer;
-    }
+    // public VideoPlayer getMainPlayer() {
+    //     return mainPlayer;
+    // }
 
     public TestRenderDispatcher getTestRenderDispatcher() {
         return testRenderDispatcher;
@@ -42,10 +43,13 @@ public class VideoLibClient implements ClientModInitializer {
         instance = this;
         testRenderDispatcher = new TestRenderDispatcher();
 
-        initVideoManager(new VLCVideoManager());
+        // initVideoManager(new VLCVideoManager());
 
         WorldRenderEvents.AFTER_ENTITIES.register(testRenderDispatcher::render);
         AddVideoPlayerCommand.register(ClientCommandManager.DISPATCHER);
+
+        AfterInitCallback.EVENT.register(client -> {
+        });
     }
 
     protected void initVideoManager(VideoManager videoManager) {

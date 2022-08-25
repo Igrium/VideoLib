@@ -5,6 +5,7 @@ import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.lit
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
+import com.igrium.videolib.VideoLib;
 import com.igrium.videolib.VideoLibClient;
 import com.igrium.videolib.api.VideoPlayer;
 import com.mojang.brigadier.CommandDispatcher;
@@ -24,10 +25,10 @@ public final class AddVideoPlayerCommand {
             TestVideoPlayer videoPlayer = new TestVideoPlayer();
             videoPlayer.setPos(context.getSource().getPosition());
 
-            VideoPlayer player = VideoLibClient.getInstance().getMainPlayer();
+            VideoPlayer player = VideoLib.getInstance().getDefaultPlayer();
             videoPlayer.setTexture(player.getTexture());
             
-            player.getMediaInterface().play(new Identifier("videolib", "videos/crash_test.mp4"));
+            player.getMediaInterface().play(new Identifier("videolib", "videos/camera.mp4"));
 
             VideoLibClient.getInstance().getTestRenderDispatcher().players.add(videoPlayer);
 
@@ -36,7 +37,7 @@ public final class AddVideoPlayerCommand {
         dispatcher.getRoot().addChild(spawnVideoPlayer);
 
         LiteralCommandNode<FabricClientCommandSource> updateVideoPlayer = literal("updateVideoPlayer").executes(context -> {
-            VideoPlayer player = VideoLibClient.getInstance().getMainPlayer();
+            VideoPlayer player = VideoLib.getInstance().getDefaultPlayer();
             try {
                 player.getMediaInterface().play("file:///F:/Documents/Programming/tests/vlcj_test/app/src/main/resources/creeper.mp4");
             } catch (MalformedURLException | URISyntaxException e) {
