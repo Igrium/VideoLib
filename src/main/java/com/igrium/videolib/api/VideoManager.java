@@ -1,5 +1,8 @@
 package com.igrium.videolib.api;
 
+import java.util.Collection;
+
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.util.Identifier;
 
 /**
@@ -37,4 +40,16 @@ public interface VideoManager extends AutoCloseable {
      * @return If this video player was found.
      */
     public boolean closePlayer(Identifier id);
+
+    /**
+     * Get a resource reload listener responsible for loading video files.
+     * @return Reload listener.
+     */
+    public IdentifiableResourceReloadListener getReloadListener();
+
+    /**
+     * Get the extensions that this implementation supports.
+     * @return A collection of extensions, excluding the period. ('mp4', NOT '.mp4')
+     */
+    public Collection<String> supportedExtensions();
 }

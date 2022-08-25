@@ -1,5 +1,7 @@
 package com.igrium.videolib.vlc;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -62,5 +64,32 @@ public final class VLCUtils {
             return uri.toString();
         }
 
+    }
+
+    public static class VLCFileHandle implements VLCVideoHandle {
+
+        private final File file;
+        private final URI url;
+
+        public VLCFileHandle(File file) {
+            this.file = file;
+            this.url = file.toURI();
+        }
+
+        @Override
+        public boolean exists() {
+            return file.exists();
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return new FileInputStream(file);
+        }
+
+        @Override
+        public String getMrl() {
+            return file.toString();
+        }
+        
     }
 }

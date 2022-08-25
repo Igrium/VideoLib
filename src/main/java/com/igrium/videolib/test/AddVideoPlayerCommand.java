@@ -13,7 +13,8 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;;
 
 
 public final class AddVideoPlayerCommand {
@@ -26,11 +27,7 @@ public final class AddVideoPlayerCommand {
             VideoPlayer player = VideoLibClient.getInstance().getMainPlayer();
             videoPlayer.setTexture(player.getTexture());
             
-            try {
-                player.getMediaInterface().play("file:///F:/Documents/Programming/tests/vlcj_test/app/src/main/resources/crash_test.mp4");
-            } catch (MalformedURLException | URISyntaxException e) {
-                throw new SimpleCommandExceptionType(Text.of(e.getMessage())).create();
-            }
+            player.getMediaInterface().play(new Identifier("videolib", "videos/crash_test.mp4"));
 
             VideoLibClient.getInstance().getTestRenderDispatcher().players.add(videoPlayer);
 

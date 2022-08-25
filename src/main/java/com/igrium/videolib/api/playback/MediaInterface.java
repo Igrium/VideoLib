@@ -26,6 +26,10 @@ public interface MediaInterface<T extends VideoHandle> {
         return load(getHandle(uri));
     }
 
+    public default boolean load(Identifier id) {
+        return load(getHandle(id));
+    }
+
     /**
      * Load a video and play it.
      * @param handle Video handle.
@@ -35,6 +39,10 @@ public interface MediaInterface<T extends VideoHandle> {
 
     public default boolean play(String uri) throws MalformedURLException, URISyntaxException {
         return play(getHandle(uri));
+    }
+
+    public default boolean play(Identifier id) {
+        return play(getHandle(id));
     }
 
     /**

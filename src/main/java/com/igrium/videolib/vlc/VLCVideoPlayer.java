@@ -109,7 +109,7 @@ public class VLCVideoPlayer implements VideoPlayer {
 
         @Override
         public VLCVideoHandle getHandle(Identifier id) {
-            return null;
+            return manager.getHandle(id);
         }
 
         @Override

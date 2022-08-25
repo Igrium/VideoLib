@@ -9,6 +9,8 @@ import com.igrium.videolib.vlc.VLCVideoManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
 public class VideoLibClient implements ClientModInitializer {
@@ -40,11 +42,17 @@ public class VideoLibClient implements ClientModInitializer {
         instance = this;
         testRenderDispatcher = new TestRenderDispatcher();
 
-        videoManager = new VLCVideoManager();
-        mainPlayer = videoManager.getOrCreate(new Identifier("videolib", "default"));
+        initVideoManager(new VLCVideoManager());
 
         WorldRenderEvents.AFTER_ENTITIES.register(testRenderDispatcher::render);
         AddVideoPlayerCommand.register(ClientCommandManager.DISPATCHER);
+    }
+
+    protected void initVideoManager(VideoManager videoManager) {
+        this.videoManager = videoManager;
+        mainPlayer = videoManager.getOrCreate(new Identifier("videolib", "default"));
+
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(videoManager.getReloadListener());
     }
     
 }
