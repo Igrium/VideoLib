@@ -10,7 +10,7 @@ import com.igrium.videolib.api.VideoHandle;
 import net.minecraft.util.Identifier;
 
 /**
- * Behavior pertaining loading and playback of video media.
+ * Behavior pertaining to the loading and playback of video media.
  * @param <T> The type that's expected for the video handle.
  */
 public interface MediaInterface<T extends VideoHandle> {
@@ -32,10 +32,15 @@ public interface MediaInterface<T extends VideoHandle> {
 
     /**
      * Load a video and play it.
+     * 
      * @param handle Video handle.
      * @return Success.
+     * @throws IllegalArgumentException If this this video player is incompatible
+     *                                  with this handle. Use
+     *                                  <code>getHandle()</code> to get a handle
+     *                                  guarenteed to work with this player.
      */
-    public boolean play(T handle);
+    public boolean play(VideoHandle handle) throws IllegalArgumentException;
 
     public default boolean play(String uri) throws MalformedURLException, URISyntaxException {
         return play(getHandle(uri));

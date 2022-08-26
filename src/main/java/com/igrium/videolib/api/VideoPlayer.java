@@ -1,5 +1,6 @@
 package com.igrium.videolib.api;
 
+import com.igrium.videolib.api.playback.CodecInterface;
 import com.igrium.videolib.api.playback.ControlsInterface;
 import com.igrium.videolib.api.playback.MediaInterface;
 
@@ -24,6 +25,7 @@ public interface VideoPlayer extends AutoCloseable {
 
     public MediaInterface<?> getMediaInterface();
     public ControlsInterface getControlsInterface();
+    public CodecInterface getCodecInterface();
 
     /**
      * Generate a texture identifier from a video player identifier. This is just an

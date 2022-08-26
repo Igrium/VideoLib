@@ -1,5 +1,8 @@
 package com.igrium.videolib.api.playback;
 
+/**
+ * Behavior pertaining to the playback of the current video (play/pause, etc.)
+ */
 public interface ControlsInterface {
 
     /**

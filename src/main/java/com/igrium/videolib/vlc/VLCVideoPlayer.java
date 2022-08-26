@@ -6,13 +6,16 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+import com.igrium.videolib.api.VideoHandle;
 import com.igrium.videolib.api.VideoPlayer;
+import com.igrium.videolib.api.playback.CodecInterface;
 import com.igrium.videolib.api.playback.ControlsInterface;
 import com.igrium.videolib.api.playback.MediaInterface;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import uk.co.caprica.vlcj.media.VideoTrackInfo;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 public class VLCVideoPlayer implements VideoPlayer {
@@ -24,6 +27,7 @@ public class VLCVideoPlayer implements VideoPlayer {
 
     protected VLCMediaInterface mediaInterface = new VLCMediaInterface();
     protected VLCControlsInterface controlsInterface = new VLCControlsInterface();
+    protected VLCCodecInterface codecInterface = new VLCCodecInterface();
 
     private boolean textureRegistered = false;
 
@@ -82,6 +86,11 @@ public class VLCVideoPlayer implements VideoPlayer {
     public ControlsInterface getControlsInterface() {
         return controlsInterface;
     }
+    
+    @Override
+    public VLCCodecInterface getCodecInterface() {
+        return codecInterface;
+    }
 
     public class VLCMediaInterface implements MediaInterface<VLCVideoHandle> {
 
@@ -92,9 +101,12 @@ public class VLCVideoPlayer implements VideoPlayer {
         }
 
         @Override
-        public boolean play(VLCVideoHandle handle) {
-            currentMedia = handle;
-            return mediaPlayer.media().play(handle.getMrl());
+        public boolean play(VideoHandle handle) {
+            if (!(handle instanceof VLCVideoHandle)) {
+                throw new IllegalArgumentException("Incompatible handle.");
+            }
+            currentMedia = (VLCVideoHandle) handle;
+            return mediaPlayer.media().play(currentMedia.getMrl());
         }
 
         @Override
@@ -159,6 +171,49 @@ public class VLCVideoPlayer implements VideoPlayer {
         @Override
         public boolean repeat() {
             return mediaPlayer.controls().getRepeat();
+        }
+        
+    }
+
+    public class VLCCodecInterface implements CodecInterface {
+
+        private VideoTrackInfo getVideoTrack() {
+            return mediaPlayer.media().info().videoTracks().get(0);
+        }
+        private boolean hasVideoTrack() {
+            return !mediaPlayer.media().info().videoTracks().isEmpty();
+        }
+
+        @Override
+        public int getWidth() {
+            if (!hasVideoTrack()) return 0;
+            return getVideoTrack().width();
+        }
+
+        @Override
+        public int getHeight() {
+            if (!hasVideoTrack()) return 0;
+            return getVideoTrack().height();
+        }
+
+        @Override
+        public float getFrameRate() {
+            if (!hasVideoTrack()) return 0;
+            VideoTrackInfo videoTrack = getVideoTrack();
+            float fps = videoTrack.frameRate();
+            float base = videoTrack.frameRateBase();
+            return fps / base;
+        }
+
+        @Override
+        public float getAspectRatio() {
+            if (!hasVideoTrack()) return 1;
+
+            VideoTrackInfo videoTrack = getVideoTrack();
+            float ratio = videoTrack.sampleAspectRatio();
+            float base = videoTrack.sampleAspectRatioBase();
+
+            return CodecInterface.super.getAspectRatio() * (ratio / base);
         }
         
     }

@@ -22,7 +22,7 @@
     ],
     "client": [
       "com.igrium.videolib.VideoLib",
-      "com.igrium.videolib.VideoLibClient"
+      "com.igrium.videolib.demo.VideoLibDemo"
     ]
   },
   "mixins": [
