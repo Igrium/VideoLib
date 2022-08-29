@@ -1,5 +1,6 @@
 package com.igrium.videolib.vlc;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +12,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
+import com.igrium.videolib.api.VideoHandle;
+import com.igrium.videolib.api.VideoHandleFactory;
 import com.igrium.videolib.api.VideoManager;
 import com.igrium.videolib.util.FileVideoLoader;
-import com.igrium.videolib.vlc.VLCUtils.VLCFileHandle;
 
 import net.minecraft.util.Identifier;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
@@ -26,14 +28,29 @@ import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 public class VLCVideoManager implements VideoManager {
     public static final Set<String> EXTENSIONS = ImmutableSet.of("mp4", "webm", "avi", "mov", "mpeg");
 
+    public class VLCVideoHandleFactory implements VideoHandleFactory {
+
+        @Override
+        public VideoHandle getVideoHandle(Identifier id) {
+            return videos.get(id);
+        }
+
+        @Override
+        public VideoHandle getVideoHandle(URL url) {
+            return new VideoHandle.UrlVideoHandle(url);
+        }
+
+    }
+    private final VLCVideoHandleFactory videoHandleFactory = new VLCVideoHandleFactory();
+
     private MediaPlayerFactory factory;
     private Logger LOGGER = LogManager.getLogger();
 
     private final Map<Identifier, VLCVideoPlayer> videoPlayers = new HashMap<>();
-    private final Map<Identifier, VLCVideoHandle> videos = new HashMap<>();
+    private final Map<Identifier, VideoHandle> videos = new HashMap<>();
     
-    protected FileVideoLoader<VLCVideoHandle> loader = new FileVideoLoader<>(
-            EXTENSIONS::contains, VLCFileHandle::new, videos::putAll);
+    protected FileVideoLoader<VideoHandle> loader = new FileVideoLoader<>(
+            EXTENSIONS::contains, VideoHandle.FileVideoHandle::new, videos::putAll);
 
     public VLCVideoManager() {
         try {
@@ -67,14 +84,18 @@ public class VLCVideoManager implements VideoManager {
         return player;
     }
 
-    public Map<Identifier, VLCVideoHandle> getVideos() {
+    public Map<Identifier, VideoHandle> getVideos() {
         return videos;
     }
 
-    public VLCVideoHandle getHandle(Identifier id) {
+    public VideoHandle getHandle(Identifier id) {
         return videos.get(id);
     }
 
+    /**
+     * Get the native media player factory from VLCJ
+     * @return The factory
+     */
     public MediaPlayerFactory getFactory() {
         if (!hasNatives()) {
             throw new IllegalStateException("No natives!");
@@ -83,7 +104,12 @@ public class VLCVideoManager implements VideoManager {
     }
 
     @Override
-    public FileVideoLoader<? extends VLCVideoHandle> getReloadListener() {
+    public VideoHandleFactory getVideoHandleFactory() {
+        return videoHandleFactory;
+    }
+
+    @Override
+    public FileVideoLoader<? extends VideoHandle> getReloadListener() {
         return loader;
     }
 

@@ -64,4 +64,12 @@ public interface VideoManager extends AutoCloseable {
      * @return A collection of extensions, excluding the period. ('mp4', NOT '.mp4')
      */
     public Collection<String> supportedExtensions();
+
+    /**
+     * Get a video handle factory that will create handles compatible with this
+     * video manager.
+     * 
+     * @return The video handle factory.
+     */
+    public VideoHandleFactory getVideoHandleFactory();
 }

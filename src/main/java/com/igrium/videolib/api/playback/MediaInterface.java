@@ -1,33 +1,32 @@
 package com.igrium.videolib.api.playback;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
 import com.igrium.videolib.api.VideoHandle;
+import com.igrium.videolib.api.VideoHandleFactory;
 
 import net.minecraft.util.Identifier;
 
 /**
  * Behavior pertaining to the loading and playback of video media.
- * @param <T> The type that's expected for the video handle.
  */
-public interface MediaInterface<T extends VideoHandle> {
+public interface MediaInterface {
 
     /**
      * Load a video and prepare it for playback.
      * @param handle Video handle.
      * @return Success.
      */
-    public boolean load(T handle);
+    public boolean load(VideoHandle handle);
 
-    public default boolean load(String uri) throws MalformedURLException, URISyntaxException {
-        return load(getHandle(uri));
+    public default boolean load(String url) throws MalformedURLException, URISyntaxException {
+        return load(getVideoHandleFactory().getVideoHandle(url));
     }
 
     public default boolean load(Identifier id) {
-        return load(getHandle(id));
+        return load(getVideoHandleFactory().getVideoHandle(id));
     }
 
     /**
@@ -42,12 +41,12 @@ public interface MediaInterface<T extends VideoHandle> {
      */
     public boolean play(VideoHandle handle) throws IllegalArgumentException;
 
-    public default boolean play(String uri) throws MalformedURLException, URISyntaxException {
-        return play(getHandle(uri));
+    public default boolean play(String url) throws MalformedURLException, URISyntaxException {
+        return play(getVideoHandleFactory().getVideoHandle(url));
     }
 
     public default boolean play(Identifier id) {
-        return play(getHandle(id));
+        return play(getVideoHandleFactory().getVideoHandle(id));
     }
 
     /**
@@ -57,29 +56,19 @@ public interface MediaInterface<T extends VideoHandle> {
     public boolean hasMedia();
 
     /**
-     * Get the handle of the currently loaded video.
+     * Get the handle of the currently loaded video. Note: most implementations will
+     * attempt to reverse-engineer the handle from the native player. If you need
+     * the original handle, keep track of it yourself.
+     * 
      * @return An optional with the handle.
      */
-    public Optional<T> currentMedia();
+    public Optional<VideoHandle> currentMedia();
 
     /**
-     * Get a media handle that this player will support from an identifier.
+     * Get the factory that should be used to generate video handles for this
+     * player.
      * 
-     * @param id ID to use.
-     * @return The handle.
+     * @return Video handle factory.
      */
-    public T getHandle(Identifier id);
-
-    /**
-     * Get a media handle that this player will support from a uri.
-     * 
-     * @param uri Uri to use.
-     * @return The handle.
-     * @throws MalformedURLException If the URL protocol is not supported.
-     */
-    public T getHandle(URI uri) throws MalformedURLException;
-
-    public default T getHandle(String uri) throws MalformedURLException, URISyntaxException {
-        return getHandle(new URI(uri));
-    }
+    public VideoHandleFactory getVideoHandleFactory();
 }

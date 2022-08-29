@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.igrium.videolib.api.VideoHandleFactory;
 import com.igrium.videolib.api.VideoManager;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.api.VideoManager.VideoManagerFactory;
@@ -62,6 +63,16 @@ public final class VideoLib implements ClientModInitializer {
      */
     public VideoManager getVideoManager() {
         return videoManager;
+    }
+
+    /**
+     * Get the active video handle factory. Shortcut for
+     * <code>getVideoManager().getHandleFactory()</code>
+     * 
+     * @return The video handle factory.
+     */
+    public VideoHandleFactory getHandleFactory() {
+        return videoManager.getVideoHandleFactory();
     }
 
     /**

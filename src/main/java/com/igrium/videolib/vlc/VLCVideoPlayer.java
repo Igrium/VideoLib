@@ -1,12 +1,12 @@
 package com.igrium.videolib.vlc;
 
 import java.net.MalformedURLException;
-import java.net.URI;
+import java.net.URL;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
 
 import com.igrium.videolib.api.VideoHandle;
+import com.igrium.videolib.api.VideoHandleFactory;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.api.playback.CodecInterface;
 import com.igrium.videolib.api.playback.ControlsInterface;
@@ -30,11 +30,7 @@ public class VLCVideoPlayer implements VideoPlayer {
     protected VLCCodecInterface codecInterface = new VLCCodecInterface();
 
     private boolean textureRegistered = false;
-
-    @Nullable
-    private VLCVideoHandle currentMedia;
     
-
     protected VLCVideoPlayer(Identifier id, VLCVideoManager manager) {
         this.id = id;
         this.manager = manager;
@@ -78,7 +74,7 @@ public class VLCVideoPlayer implements VideoPlayer {
     }
 
     @Override
-    public MediaInterface<VLCVideoHandle> getMediaInterface() {
+    public MediaInterface getMediaInterface() {
         return mediaInterface;
     }
 
@@ -92,41 +88,43 @@ public class VLCVideoPlayer implements VideoPlayer {
         return codecInterface;
     }
 
-    public class VLCMediaInterface implements MediaInterface<VLCVideoHandle> {
+    public class VLCMediaInterface implements MediaInterface {
 
-        @Override
-        public boolean load(VLCVideoHandle handle) {
-            currentMedia = handle;
-            return mediaPlayer.media().prepare(handle.getMrl());
+        private String getAddress(VideoHandle handle) {
+            Optional<String> address = handle.getAddress();
+            if (address.isEmpty()) {
+                throw new IllegalArgumentException("This video player only supports video handles with accessible URLs.");
+            }
+            return address.get();
         }
 
         @Override
-        public boolean play(VideoHandle handle) {
-            if (!(handle instanceof VLCVideoHandle)) {
-                throw new IllegalArgumentException("Incompatible handle.");
-            }
-            currentMedia = (VLCVideoHandle) handle;
-            return mediaPlayer.media().play(currentMedia.getMrl());
+        public boolean load(VideoHandle handle) {
+            return mediaPlayer.media().prepare(getAddress(handle));
+        }
+
+        @Override
+        public boolean play(VideoHandle handle) throws IllegalArgumentException {
+            return mediaPlayer.media().play(getAddress(handle));
         }
 
         @Override
         public boolean hasMedia() {
-            return currentMedia != null;
+            return mediaPlayer.status().isPlayable();
         }
 
         @Override
-        public Optional<VLCVideoHandle> currentMedia() {
-            return Optional.ofNullable(currentMedia);
+        public Optional<VideoHandle> currentMedia() {
+            try {
+                return Optional.of(new VideoHandle.UrlVideoHandle(new URL(mediaPlayer.media().info().mrl())));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("VLC returned an illegal URL.", e);
+            }
         }
 
         @Override
-        public VLCVideoHandle getHandle(Identifier id) {
-            return manager.getHandle(id);
-        }
-
-        @Override
-        public VLCVideoHandle getHandle(URI uri) throws MalformedURLException {
-            return new VLCUtils.VLCUrlHandle(uri);
+        public VideoHandleFactory getVideoHandleFactory() {
+            return manager.getVideoHandleFactory();
         }
     }
 
@@ -140,7 +138,6 @@ public class VLCVideoPlayer implements VideoPlayer {
         @Override
         public void stop() {
             mediaPlayer.controls().stop();
-            currentMedia = null;
         }
 
         @Override

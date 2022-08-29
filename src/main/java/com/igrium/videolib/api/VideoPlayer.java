@@ -23,7 +23,7 @@ public interface VideoPlayer extends AutoCloseable {
      */
     public Identifier getTexture();
 
-    public MediaInterface<?> getMediaInterface();
+    public MediaInterface getMediaInterface();
     public ControlsInterface getControlsInterface();
     public CodecInterface getCodecInterface();
 

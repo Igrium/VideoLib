@@ -27,7 +27,7 @@ public final class PlayVideoCommand {
         dispatcher.register(literal("playvideo").then(
             argument("id", IdentifierArgumentType.identifier()).executes(context -> {
                 Identifier id = context.getArgument("id", Identifier.class);
-                VideoHandle handle = videoLib.getDefaultPlayer().getMediaInterface().getHandle(id);
+                VideoHandle handle = videoLib.getHandleFactory().getVideoHandle(id);
                 return play(handle) ? 1 : 0;
             })
         ).then(
@@ -35,7 +35,7 @@ public final class PlayVideoCommand {
                 URI uri = UriArgumentType.getUri(context, "url");
                 VideoHandle handle;
                 try {
-                    handle = videoLib.getDefaultPlayer().getMediaInterface().getHandle(uri);
+                    handle = videoLib.getHandleFactory().getVideoHandle(uri.toURL());
                 } catch (MalformedURLException e) {
                     throw new SimpleCommandExceptionType(Text.of(e.getMessage())).create();
                 }
