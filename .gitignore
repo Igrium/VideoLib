@@ -31,3 +31,10 @@ bin/
 # fabric
 
 run/
+
+
+# Test video files
+*.mp4
+*.mov
+*.avi
+*.webm

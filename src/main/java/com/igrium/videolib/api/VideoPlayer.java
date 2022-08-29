@@ -3,6 +3,7 @@ package com.igrium.videolib.api;
 import com.igrium.videolib.api.playback.CodecInterface;
 import com.igrium.videolib.api.playback.ControlsInterface;
 import com.igrium.videolib.api.playback.MediaInterface;
+import com.igrium.videolib.api.playback.VideoEvents;
 
 import net.minecraft.util.Identifier;
 
@@ -26,6 +27,7 @@ public interface VideoPlayer extends AutoCloseable {
     public MediaInterface getMediaInterface();
     public ControlsInterface getControlsInterface();
     public CodecInterface getCodecInterface();
+    public VideoEvents getEvents();
 
     /**
      * Generate a texture identifier from a video player identifier. This is just an

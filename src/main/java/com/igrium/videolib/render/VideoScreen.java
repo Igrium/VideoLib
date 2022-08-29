@@ -1,9 +1,11 @@
-package com.igrium.videolib.demo;
+package com.igrium.videolib.render;
 
 import com.igrium.videolib.VideoLib;
+import com.igrium.videolib.api.VideoHandle;
 import com.igrium.videolib.api.VideoPlayer;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -19,7 +21,7 @@ import net.minecraft.util.math.Matrix4f;
 /**
  * Renders a video player in a traditional fullscreen interface.
  */
-public class FullscreenVideoScreen extends Screen {
+public class VideoScreen extends Screen {
 
     protected record SimpleQuad(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1){
         public SimpleQuad(float x0, float y0, float x1, float y1) {
@@ -31,13 +33,32 @@ public class FullscreenVideoScreen extends Screen {
     private int backgroundColor = ColorHelper.Argb.getArgb(255, 0, 0, 0);
     private boolean userClosable = true;
 
+    private boolean isStopping = false;
+
     /**
      * Construct a fullscreen video screen.
      * @param player Video player to use.
      */
-    public FullscreenVideoScreen(VideoPlayer player) {
+    public VideoScreen(VideoPlayer player) {
         super(new LiteralText("Video Player"));
         this.player = player;
+        player.getEvents().onceFinished(e -> {
+            isStopping = true;
+            close();
+        });
+    }
+
+    /**
+     * Load a video and display this screen once it starts playing.
+     * @param handle The video handle.
+     * @return Whether the video could be loaded.
+     */
+    public boolean playAndShow(VideoHandle handle) {
+        boolean canPlay = player.getMediaInterface().play(handle);
+        if (canPlay) {
+            player.getEvents().oncePlaying(e -> MinecraftClient.getInstance().setScreen(this));
+        }
+        return canPlay;
     }
 
     public int getBackgroundColor() {
@@ -60,7 +81,7 @@ public class FullscreenVideoScreen extends Screen {
     /**
      * Construct a fullscreen video screen using the default player.
      */
-    public FullscreenVideoScreen() {
+    public VideoScreen() {
         this(VideoLib.getInstance().getDefaultPlayer());
     }
 
@@ -91,7 +112,7 @@ public class FullscreenVideoScreen extends Screen {
 
     @Override
     public void close() {
-        player.getControlsInterface().stop();
+        if (!isStopping) player.getControlsInterface().stop();
         super.close();
     }
     

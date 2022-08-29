@@ -29,6 +29,8 @@ public class VLCVideoPlayer implements VideoPlayer {
     protected VLCControlsInterface controlsInterface = new VLCControlsInterface();
     protected VLCCodecInterface codecInterface = new VLCCodecInterface();
 
+    protected VLCEvents events = new VLCEvents();
+
     private boolean textureRegistered = false;
     
     protected VLCVideoPlayer(Identifier id, VLCVideoManager manager) {
@@ -42,6 +44,7 @@ public class VLCVideoPlayer implements VideoPlayer {
         mediaPlayer = manager.getFactory().mediaPlayers().newEmbeddedMediaPlayer();
         surface = new OpenGLVideoSurface();
         mediaPlayer.videoSurface().set(surface);
+        mediaPlayer.events().addMediaPlayerEventListener(events);
     }
 
     public final Identifier getId() {
@@ -88,6 +91,11 @@ public class VLCVideoPlayer implements VideoPlayer {
         return codecInterface;
     }
 
+    @Override
+    public VLCEvents getEvents() {
+        return events;
+    }
+
     public class VLCMediaInterface implements MediaInterface {
 
         private String getAddress(VideoHandle handle) {
@@ -132,7 +140,7 @@ public class VLCVideoPlayer implements VideoPlayer {
 
         @Override
         public void play() {
-            mediaPlayer.controls().play();           
+            mediaPlayer.controls().play();       
         }
 
         @Override
@@ -178,7 +186,11 @@ public class VLCVideoPlayer implements VideoPlayer {
             return mediaPlayer.media().info().videoTracks().get(0);
         }
         private boolean hasVideoTrack() {
-            return !mediaPlayer.media().info().videoTracks().isEmpty();
+            try {
+                return !mediaPlayer.media().info().videoTracks().isEmpty();
+            } catch (NullPointerException e) {
+                return false;
+            }
         }
 
         @Override

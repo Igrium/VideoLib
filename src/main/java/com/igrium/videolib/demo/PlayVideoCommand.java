@@ -9,11 +9,11 @@ import java.net.URI;
 import com.igrium.videolib.VideoLib;
 import com.igrium.videolib.api.VideoHandle;
 import com.igrium.videolib.api.VideoPlayer;
+import com.igrium.videolib.render.VideoScreen;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -21,7 +21,6 @@ import net.minecraft.util.Identifier;
 public final class PlayVideoCommand {
     private PlayVideoCommand() {};
     private static VideoLib videoLib = VideoLib.getInstance();
-    private static MinecraftClient client = MinecraftClient.getInstance();
 
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         dispatcher.register(literal("playvideo").then(
@@ -46,8 +45,6 @@ public final class PlayVideoCommand {
 
     public static boolean play(VideoHandle handle) {
         VideoPlayer player = videoLib.getDefaultPlayer();
-        client.send(() -> client.setScreen(new FullscreenVideoScreen(player)));
-
-        return player.getMediaInterface().play(handle);
+        return new VideoScreen(player).playAndShow(handle);
     }
 }
