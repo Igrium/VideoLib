@@ -13,6 +13,7 @@ import com.igrium.videolib.api.VideoManager;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.api.VideoManager.VideoManagerFactory;
 import com.igrium.videolib.config.VideoLibConfig;
+import com.igrium.videolib.dummy.DummyVideoManager;
 import com.igrium.videolib.util.AfterInitCallback;
 import com.igrium.videolib.util.MissingNativesException;
 import com.igrium.videolib.vlc.VLCVideoManager;
@@ -123,6 +124,7 @@ public final class VideoLib implements ClientModInitializer {
             LOGGER.info("Initialized video implementation: {}", implementation);
         } catch (MissingNativesException e) {
             LOGGER.error("Unable to init VideoLib.", e);
+            initVideoManager(new DummyVideoManager());
         }
         
     }

@@ -8,14 +8,12 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.collect.ImmutableSet;
 import com.igrium.videolib.api.VideoHandle;
 import com.igrium.videolib.api.VideoHandleFactory;
 import com.igrium.videolib.api.VideoManager;
 import com.igrium.videolib.util.FileVideoLoader;
+import com.igrium.videolib.util.MissingNativesException;
 
 import net.minecraft.util.Identifier;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
@@ -44,7 +42,6 @@ public class VLCVideoManager implements VideoManager {
     private final VLCVideoHandleFactory videoHandleFactory = new VLCVideoHandleFactory();
 
     private MediaPlayerFactory factory;
-    private Logger LOGGER = LogManager.getLogger();
 
     private final Map<Identifier, VLCVideoPlayer> videoPlayers = new HashMap<>();
     private final Map<Identifier, VideoHandle> videos = new HashMap<>();
@@ -52,16 +49,12 @@ public class VLCVideoManager implements VideoManager {
     protected FileVideoLoader<VideoHandle> loader = new FileVideoLoader<>(
             EXTENSIONS::contains, VideoHandle.FileVideoHandle::new, videos::putAll);
 
-    public VLCVideoManager() {
+    public VLCVideoManager() throws MissingNativesException {
         try {
             factory = new MediaPlayerFactory(new NativeDiscovery());
         } catch (NativeLibraryMappingException e) {
-            LOGGER.error("Unable to load VLC natives! ", e);
+            throw new MissingNativesException("Unable to load VLC natives!", e);
         }
-    }
-
-    public boolean hasNatives() {
-        return factory != null;
     }
 
     @Nullable
@@ -97,9 +90,6 @@ public class VLCVideoManager implements VideoManager {
      * @return The factory
      */
     public MediaPlayerFactory getFactory() {
-        if (!hasNatives()) {
-            throw new IllegalStateException("No natives!");
-        }
         return factory;
     }
 

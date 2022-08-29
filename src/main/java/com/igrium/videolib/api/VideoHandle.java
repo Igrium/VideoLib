@@ -53,6 +53,10 @@ public interface VideoHandle {
             return url.openStream();
         }
 
+        @Override
+        public String toString() {
+            return "UrlVideoHandle["+VideoLibUtils.fixUrl(url)+"]";
+        }
     }
 
     /**
@@ -77,6 +81,11 @@ public interface VideoHandle {
         @Override
         public InputStream openStream() throws FileNotFoundException {
             return new FileInputStream(file);
+        }
+
+        @Override
+        public String toString() {
+            return "FileVideoHandle["+file+"]";
         }
     }
 }

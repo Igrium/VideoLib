@@ -21,12 +21,6 @@ public interface VideoManager extends AutoCloseable {
          */
         public VideoManager create() throws MissingNativesException;
     }
-
-    /**
-     * Was this video manager able to properly load it's native dependencies?
-     * @return If we have natives.
-     */
-    public boolean hasNatives();
     
     /**
      * Get a video player by its identifier.
