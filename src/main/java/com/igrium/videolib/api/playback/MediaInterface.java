@@ -41,7 +41,7 @@ public interface MediaInterface {
      */
     public boolean play(VideoHandle handle) throws IllegalArgumentException;
 
-    public default boolean play(String url) throws MalformedURLException, URISyntaxException {
+    public default boolean play(String url) throws MalformedURLException {
         return play(getVideoHandleFactory().getVideoHandle(url));
     }
 
