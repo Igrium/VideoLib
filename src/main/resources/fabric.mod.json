@@ -10,13 +10,13 @@
   ],
   "contact": {
     "homepage": "http://igrium.com/",
-    "sources": ""
+    "sources": "https://github.com/Sam54123/VideoLib"
   },
 
   "license": "MIT",
   "icon": "assets/videolib/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
     ],
