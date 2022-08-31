@@ -27,7 +27,9 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	implementation(include('uk.co.caprica:vlcj:4.7.3'))
+	implementation(include("uk.co.caprica:vlcj:${project.vlcj_version}"))
+    include "uk.co.caprica:vlcj-natives:4.7.0"
+    include "uk.co.caprica:vlcj-osx-stubs:1.0.0"
 }
 
 processResources {
