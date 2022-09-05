@@ -1,0 +1,10 @@
+com.igrium.videolib
+com.igrium.videolib.api
+com.igrium.videolib.api.playback
+com.igrium.videolib.config
+com.igrium.videolib.demo
+com.igrium.videolib.dummy
+com.igrium.videolib.mixins
+com.igrium.videolib.render
+com.igrium.videolib.util
+com.igrium.videolib.vlc
