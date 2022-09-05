@@ -1,4 +1,4 @@
-*This library is for Minecraft 1.18.2. Ports for other versions will come in time. If you wish to port it yourself, pull requests are welcome!*
+*This library is for Minecraft Fabric 1.18.2. Ports for other versions will come in time. If you wish to port it yourself, pull requests are welcome!*
 
 # VideoLib
 
@@ -71,7 +71,7 @@ ControlsInterface controlsInterface = videoPlayer.getControlsInterface();
 CodecInterface codecInterface = videoPlayer.getCodecInterface();
 ```
 
-These three interfaces provide a multitude of essential functions, such as `pause`, `play`, and `setTime`. Details on these API features can be found in the javadoc.
+These three interfaces provide a multitude of essential functions, such as `pause`, `play`, and `setTime`. Details on these API features can be found in the [javadoc](https://sam54123.github.io/VideoLib/com/igrium/videolib/api/playback/package-summary.html).
 
 ## Events
 
@@ -84,7 +84,7 @@ events.onBuffering(e -> {
 })
 ```
 
-Like, the playback interfaces, event functions are detailed in the javadoc.
+Like, the playback interfaces, event functions are detailed in the [javadoc](https://sam54123.github.io/VideoLib/com/igrium/videolib/api/playback/VideoEvents.html).
 
 # A Note on Licenses
 
@@ -101,6 +101,3 @@ The default implementation of VideoLib relies on VLCJ, which is licensed under t
 - Warn users when VideoLib fails to initialize (usually due to missing natives).
 
 - Rendering utility functions.
-
-
-
