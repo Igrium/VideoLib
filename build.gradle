@@ -62,8 +62,8 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // groupId 'com.igrium'
-            // artifactId 'videolib'
+            groupId 'com.igrium'
+            artifactId 'videolib'
             from components.java
         }
     }
