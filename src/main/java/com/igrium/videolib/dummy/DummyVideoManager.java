@@ -97,5 +97,10 @@ public class DummyVideoManager implements VideoManager {
     public VideoHandleFactory getVideoHandleFactory() {
         return factory;
     }
+
+    @Override
+    public boolean hasNatives() {
+        return false;
+    }
     
 }

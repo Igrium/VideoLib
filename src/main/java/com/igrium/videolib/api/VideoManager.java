@@ -66,4 +66,15 @@ public interface VideoManager extends AutoCloseable {
      * @return The video handle factory.
      */
     public VideoHandleFactory getVideoHandleFactory();
+
+    /**
+     * Determine whether the native dependencies required for video playback have
+     * properly initialized. This should only return false in the dummy video
+     * player.
+     * 
+     * @return Are native dependencies present?
+     */
+    public default boolean hasNatives() {
+        return true;
+    }
 }
