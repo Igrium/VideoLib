@@ -1,5 +1,10 @@
 {
     "commands.videolib.status.not_installed": "%s does NOT have VideoLib installed!",
     "commands.videolib.status.missing_natives": "%s has VideoLib installed, but it's missing native dependencies.",
-    "commands.videolib.status.installed": "%s has VideoLib installed."
+    "commands.videolib.status.installed": "%s has VideoLib installed.",
+    "commands.videolib.send_command.success": "Sent playback command to %d players.",
+    "commands.videolib.send_command.fail_all": "Sent playback command to %d players.",
+    "commands.videolib.send_command.fail": "%d players are unable to play videos.",
+    "commands.videolib.send_command.fail_single": "%s is unable to play videos.",
+    "commands.videolib.arguments.invalid_uri": "Invalid URI"
 }

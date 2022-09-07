@@ -121,7 +121,7 @@ public final class VideoLib implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(VideoLibNetworking.PLAYBACK_COMMAND,
             (client, handler, buf, responseSender) -> {
                 PlaybackCommand command = PlaybackCommand.fromByteBuf(buf);
-                parsePlaybackCommand(command);
+                client.execute(() -> parsePlaybackCommand(command));
             });
 
         // Default video manager.
@@ -168,9 +168,12 @@ public final class VideoLib implements ClientModInitializer {
 
         if (client.currentScreen instanceof VideoScreen) {
             screen = (VideoScreen) client.currentScreen;
-        } else {
+        } else if (command.shouldOpenScreen()) {
             screen = new VideoScreen(getDefaultPlayer());
             client.setScreen(screen);
+        } else {
+            LOGGER.warn("Recieved video playback command while no video is playing: {}", command);
+            return;
         }
 
         parsePlaybackCommand(screen.getPlayer(), command);

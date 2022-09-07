@@ -14,9 +14,19 @@ import net.minecraft.util.Identifier;
  */
 public final class VideoLibNetworking {
     public static enum InstallStatus {
-        NOT_INSTALLED,
-        MISSING_NATIVES,
-        INSTALLED
+        NOT_INSTALLED(false),
+        MISSING_NATIVES(false),
+        INSTALLED(true);
+
+        private final boolean canPlay;
+
+        InstallStatus(boolean canPlay) {
+            this.canPlay = canPlay;
+        }
+
+        public boolean canPlay() {
+            return canPlay;
+        }
     }
 
     public static final Identifier SYNC_VIDEOLIB_STATUS = new Identifier("videolib", "sync_status");
@@ -40,7 +50,6 @@ public final class VideoLibNetworking {
             boolean shouldStop = buf.readBoolean();
             boolean isPaused = buf.readBoolean();
             Optional<Identifier> id = buf.readOptional(b -> b.readIdentifier());
-            Optional<Long> timeMillis = buf.readOptional(b -> b.readLong());
 
             // Read URL manually to handle exception.
             Optional<URL> url;
@@ -55,7 +64,16 @@ public final class VideoLibNetworking {
                 url = Optional.empty();
             }
 
+            Optional<Long> timeMillis = buf.readOptional(b -> b.readLong());
+
             return new PlaybackCommand(shouldStop, isPaused, id, url, timeMillis);
+        }
+
+        /**
+         * Whether this command should prompt the client to open the video playback screen.
+         */
+        public boolean shouldOpenScreen() {
+            return id().isPresent() || url.isPresent();
         }
     }
 }

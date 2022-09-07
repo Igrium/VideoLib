@@ -10,6 +10,7 @@ import com.igrium.videolib.VideoLib;
 import com.igrium.videolib.api.VideoHandle;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.render.VideoScreen;
+import com.igrium.videolib.util.UriArgumentType;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
