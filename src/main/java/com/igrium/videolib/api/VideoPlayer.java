@@ -30,6 +30,17 @@ public interface VideoPlayer extends AutoCloseable {
     public VideoEvents getEvents();
 
     /**
+     * Get a video handle factory that is compatible with this video player.
+     * Shortcut for <code>getMediaInterface().getVideoHandleFactory();</code>
+     * 
+     * @return The video handle factory.
+     * @see MediaInterface#getVideoHandleFactory()
+     */
+    public default VideoHandleFactory getHandleFactory() {
+        return getMediaInterface().getVideoHandleFactory();
+    }
+
+    /**
      * Generate a texture identifier from a video player identifier. This is just an
      * internal utility function. It's not guarenteed that any given video player
      * will use this scheme. Use {@link VideoPlayer#getTexture()} instead.

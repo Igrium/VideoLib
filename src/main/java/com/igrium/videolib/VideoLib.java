@@ -8,20 +8,32 @@ import java.nio.file.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.igrium.videolib.api.VideoHandle;
 import com.igrium.videolib.api.VideoHandleFactory;
 import com.igrium.videolib.api.VideoManager;
 import com.igrium.videolib.api.VideoPlayer;
 import com.igrium.videolib.api.VideoManager.VideoManagerFactory;
 import com.igrium.videolib.config.VideoLibConfig;
 import com.igrium.videolib.dummy.DummyVideoManager;
+import com.igrium.videolib.render.VideoScreen;
+import com.igrium.videolib.server.VideoLibNetworking;
+import com.igrium.videolib.server.VideoLibNetworking.InstallStatus;
+import com.igrium.videolib.server.VideoLibNetworking.PlaybackCommand;
 import com.igrium.videolib.util.AfterInitCallback;
 import com.igrium.videolib.util.MissingNativesException;
 import com.igrium.videolib.vlc.VLCVideoManager;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -29,6 +41,7 @@ import net.minecraft.util.registry.Registry;
 /**
  * The main class for VideoLib.
  */
+@Environment(EnvType.CLIENT)
 public final class VideoLib implements ClientModInitializer {
     public static final Registry<VideoManagerFactory> VIDEO_MANAGERS = FabricRegistryBuilder
             .createSimple(VideoManagerFactory.class, new Identifier("videolib", "managers")).buildAndRegister();
@@ -36,6 +49,7 @@ public final class VideoLib implements ClientModInitializer {
 
     private static VideoLib instance;
     private static Logger LOGGER = LogManager.getLogger();
+    private MinecraftClient client = MinecraftClient.getInstance();
     
     /**
      * Get the current VideoLib instance.
@@ -97,8 +111,77 @@ public final class VideoLib implements ClientModInitializer {
 
         AfterInitCallback.EVENT.register(client -> initVideoManager());
 
+        // Networking
+        ClientPlayConnectionEvents.JOIN.register((networkHandler, packetSender, client) -> {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeEnumConstant(getInstallStatus());
+            packetSender.sendPacket(VideoLibNetworking.SYNC_VIDEOLIB_STATUS, buf);
+        });
+        
+        ClientPlayNetworking.registerGlobalReceiver(VideoLibNetworking.PLAYBACK_COMMAND,
+            (client, handler, buf, responseSender) -> {
+                PlaybackCommand command = PlaybackCommand.fromByteBuf(buf);
+                parsePlaybackCommand(command);
+            });
+
         // Default video manager.
         Registry.register(VIDEO_MANAGERS, new Identifier("videolib", "vlcj"), VLCVideoManager::new);
+        
+    }
+
+    /**
+     * Parse a playback command with a given video player.
+     * @param player Video player to use.
+     * @param command Playback command to parse.
+     */
+    public static void parsePlaybackCommand(VideoPlayer player, PlaybackCommand command) {
+        if (command.shouldStop()) {
+            player.getControlsInterface().stop();
+            return;
+        }
+
+        if (command.id().isPresent() || command.url().isPresent()) {
+            VideoHandle handle;
+            if (command.id().isPresent()) {
+                handle = player.getHandleFactory().getVideoHandle(command.id().get());
+            } else {
+                handle = player.getHandleFactory().getVideoHandle(command.url().get());
+            }
+
+            player.getMediaInterface().play(handle);
+        }
+
+        player.getControlsInterface().setPause(command.isPaused());
+
+        if (command.timeMillis().isPresent()) {
+            player.getControlsInterface().setTime(command.timeMillis().get());
+        }
+    }
+
+    /**
+     * Parse a playback command with the fullscreen video player.
+     * @param command Video player to use.
+     * @see #parsePlaybackCommand(VideoPlayer, PlaybackCommand)
+     */
+    public void parsePlaybackCommand(PlaybackCommand command) {
+        VideoScreen screen;
+
+        if (client.currentScreen instanceof VideoScreen) {
+            screen = (VideoScreen) client.currentScreen;
+        } else {
+            screen = new VideoScreen(getDefaultPlayer());
+            client.setScreen(screen);
+        }
+
+        parsePlaybackCommand(screen.getPlayer(), command);
+    }
+    
+    /**
+     * Get the VideoLib install status of the local client.
+     * @return VideoLib install status.
+     */
+    public InstallStatus getInstallStatus() {
+        return getVideoManager().hasNatives() ? InstallStatus.INSTALLED : InstallStatus.MISSING_NATIVES;
     }
     
     private void readConfig() {

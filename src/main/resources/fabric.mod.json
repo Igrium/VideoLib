@@ -19,6 +19,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
+      "com.igrium.videolib.server.VideoLibServer"
     ],
     "client": [
       "com.igrium.videolib.VideoLib",
@@ -26,7 +27,8 @@
     ]
   },
   "mixins": [
-    "videolib.mixins.json"
+    "videolib.mixins.json",
+    "videolib_server.mixins.json"
   ],
 
   "depends": {

@@ -1,0 +1,15 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.igrium.videolib.server.mixins",
+    "compatibilityLevel": "JAVA_17",
+    "mixins": [
+        "ServerPlayerEntityMixin"
+    ],
+    "client": [
+    ],
+    "injectors": {
+      "defaultRequire": 1
+    }
+  }
+  

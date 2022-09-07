@@ -49,6 +49,14 @@ public class VideoScreen extends Screen {
     }
 
     /**
+     * Get the video player that this screen uses.
+     * @return Video player.
+     */
+    public VideoPlayer getPlayer() {
+        return player;
+    }
+
+    /**
      * Load a video and display this screen once it starts playing.
      * @param handle The video handle.
      * @return Whether the video could be loaded.
