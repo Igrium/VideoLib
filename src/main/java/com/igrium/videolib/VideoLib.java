@@ -176,6 +176,11 @@ public final class VideoLib implements ClientModInitializer {
             return;
         }
 
+        if (command.shouldStop()) {
+            screen.close();
+            return;
+        }
+
         parsePlaybackCommand(screen.getPlayer(), command);
     }
     
