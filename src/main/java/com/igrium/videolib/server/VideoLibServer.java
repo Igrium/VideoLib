@@ -4,13 +4,17 @@ import org.apache.logging.log4j.LogManager;
 
 import com.igrium.videolib.server.VideoLibNetworking.InstallStatus;
 import com.igrium.videolib.server.VideoLibNetworking.PlaybackCommand;
+import com.igrium.videolib.util.UriArgumentType;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 /**
  * Optional server-side functions regarding VideoLib
@@ -19,6 +23,8 @@ public class VideoLibServer implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ArgumentTypeRegistry.registerArgumentType(new Identifier("videolib:uri"), UriArgumentType.class, ConstantArgumentSerializer.of(UriArgumentType::uri));
+
         ServerPlayNetworking.registerGlobalReceiver(VideoLibNetworking.SYNC_VIDEOLIB_STATUS,
             (server, player, handler, buf, response) -> {
                 InstallStatus status = buf.readEnumConstant(InstallStatus.class);

@@ -34,9 +34,10 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 /**
  * The main class for VideoLib.
@@ -44,7 +45,9 @@ import net.minecraft.util.registry.Registry;
 @Environment(EnvType.CLIENT)
 public final class VideoLib implements ClientModInitializer {
     public static final Registry<VideoManagerFactory> VIDEO_MANAGERS = FabricRegistryBuilder
-            .createSimple(VideoManagerFactory.class, new Identifier("videolib", "managers")).buildAndRegister();
+            .<VideoManagerFactory>createSimple(RegistryKey.ofRegistry(new Identifier("videolib", "managers")))
+            .buildAndRegister();
+
     private static Path CONFIG_FILE = FabricLoader.getInstance().getConfigDir().resolve("videolib.json");
 
     private static VideoLib instance;

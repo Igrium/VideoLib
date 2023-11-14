@@ -1,6 +1,5 @@
 package com.igrium.videolib.util;
 
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 /**
@@ -21,12 +20,12 @@ public class MissingNativesException extends Exception {
     }
 
     public MissingNativesException() {
-        super("Unable to load playback natives.");
+        super("Unable to load video playback natives.");
     }
 
     public MissingNativesException(String message) {
         super(message);
-        errorText = new LiteralText(message);
+        errorText = Text.literal(message);
     }
 
     public MissingNativesException(Throwable cause) {
@@ -35,11 +34,11 @@ public class MissingNativesException extends Exception {
 
     public MissingNativesException(String message, Throwable cause) {
         super(message, cause);
-        errorText = new LiteralText(message);
+        errorText = Text.literal(message);
     }
 
     public MissingNativesException(Text errorText) {
-        super(errorText.asString());
+        super(errorText.getString());
         this.errorText = errorText;
     }
 
@@ -49,7 +48,7 @@ public class MissingNativesException extends Exception {
     }
 
     public MissingNativesException(Text errorText, Throwable cause) {
-        super(errorText.asString(), cause);
+        super(errorText.getString(), cause);
         this.errorText = errorText;
     }
     
@@ -58,7 +57,7 @@ public class MissingNativesException extends Exception {
     }
 
     public MissingNativesException(Text errorText, HelpButton[] helpButtons) {
-        super(errorText.asString());
+        super(errorText.getString());
         this.helpButtons = helpButtons;
     }
     

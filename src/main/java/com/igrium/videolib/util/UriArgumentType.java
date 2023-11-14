@@ -9,11 +9,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 public class UriArgumentType implements ArgumentType<URI> {
 
-    SimpleCommandExceptionType COMMAND_EXCEPTION = new SimpleCommandExceptionType(new TranslatableText("commands.videolib.arguments.invalid_uri"));
+    SimpleCommandExceptionType COMMAND_EXCEPTION = new SimpleCommandExceptionType(Text.translatable("commands.videolib.arguments.invalid_uri"));
 
     @Override
     public URI parse(StringReader reader) throws CommandSyntaxException {

@@ -1,4 +1,4 @@
-*This library is for Minecraft Fabric 1.18.2. Ports for other versions will come in time. If you wish to port it yourself, pull requests are welcome!*
+*This library is for Minecraft Fabric 1.20.2. Ports for other versions will come in time. If you wish to port it yourself, pull requests are welcome!*
 
 # VideoLib
 

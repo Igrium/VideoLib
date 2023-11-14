@@ -5,8 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import com.igrium.videolib.api.VideoHandle;
 
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
@@ -50,36 +51,35 @@ public class FileVideoLoader<T extends VideoHandle> implements IdentifiableResou
     public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler,
             Profiler applyProfiler,
             Executor prepareExecutor, Executor applyExecutor) {
-        Collection<Identifier> ids = manager.findResources("videos",
-                filename -> extensionFilter.test(FilenameUtils.getExtension(filename)));
-
+        Map<Identifier, Resource> resources = manager.findResources("videos",
+                filename -> extensionFilter.test(FilenameUtils.getExtension(filename.getPath())));
+        
         Map<Identifier, T> files = new ConcurrentHashMap<>();
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        List<CompletableFuture<Void>> futures = new LinkedList<>();
 
-        for (Identifier id : ids) {
+        for (var entry : resources.entrySet()) {
             futures.add(CompletableFuture.runAsync(() -> {
-                LOGGER.info("Loading video {}", id);
+                LOGGER.info("Loading video {}", entry.getKey());
                 try {
-                    File file = loadVideo(id, manager);
-                    files.put(id, handleFactory.apply(file));
+                    File file = loadVideo(entry.getKey(), entry.getValue());
+                    files.put(entry.getKey(), handleFactory.apply(file));
                 } catch (IOException e) {
-                    LOGGER.error("Unable to load video " + id, e);
+                    LOGGER.error("Unable to load video: " + entry.getKey(), e);
                 }
-                LOGGER.info("Finished loading {}", id);
             }, prepareExecutor));
         }
 
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0]))
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
                 .thenCompose(synchronizer::whenPrepared).thenRunAsync(() -> {
                     handleConsumer.accept(files);
                 }, applyExecutor);
     }
 
-    protected File loadVideo(Identifier id, ResourceManager manager) throws IOException {
+    protected File loadVideo(Identifier id, Resource resource) throws IOException {
         String ext = FilenameUtils.getExtension(id.getPath());
         File file = File.createTempFile("video_", "."+ext);
 
-        InputStream inputStream = manager.getResource(id).getInputStream();
+        InputStream inputStream = resource.getInputStream();
         OutputStream outputStream = new FileOutputStream(file);
 
         inputStream.transferTo(outputStream);
