@@ -55,7 +55,7 @@ public interface VideoManager extends AutoCloseable {
 
     /**
      * Get the extensions that this implementation supports.
-     * @return A collection of extensions, excluding the period. ('mp4', NOT '.mp4')
+     * @return A collection of extensions, excluding the period. (<code>'mp4'</code>, NOT <code>'.mp4'</code>)
      */
     public Collection<String> supportedExtensions();
 
